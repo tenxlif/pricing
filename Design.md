@@ -6,19 +6,19 @@ The main objective is to implement an interface where an admin can create and up
 
 ## Entities:
 
-The main entity modeled is called PricePlan. It is an immutable representation of resource for indicating price for a plan in a country. It works with another entity Customer. These entities associate to map plan's price for a customer.
+The main entity modeled is called `PricePlan`. It is an immutable representation of resource to store details for a plan in a country. It works with another entity `Customer`. These entities associate to map plan's price to a customer.
 
 ## Interface and Resources:
 The interface is exposed as a HTTP REST interaction, where a client can issue requests to create new plans, modify existing plans or view pricing details of any customer. Here are the reosouces 
 
-   * `\plans` : The main resource used to POST new pricing plans. It accepts JSON representation of the `PricePlan` object and if all input is valid, it creates a new plan. This plan is returned as part of a HTTP 302 Redirect from the original POST request.
-   * `\customers/{id}/plan`: You can query this resource to GET plan details for a customer.  It returns a `PricePlan` object. This could be optionally extended to get older plans for a customer with a timestamp parameter. (Older plan search is yet to be implemented)
-   * `\plans\{id}`: To GET details of a specific price Plan. Returns a `PricePlan` object if successful. 
-   * `country/{cid}/plans/{name}` : To GET or PUT details of a plan by country. The Content body is JSON representation of `PricePlan` object. Eg. `/country/US/plans/1S`. On applying the PUT method, the older plan is deactivated and new plan replaces it.
+   * `/plans` : The main resource used to POST new pricing plans. It accepts JSON representation of the `PricePlan` object and if all input is valid, it creates a new plan. This plan is returned as part of a HTTP 302 Redirect from the original POST request.
+   * `/customers/{id}/plan`: You can query this resource to GET plan details for a customer.  It returns a `PricePlan` object. This could be optionally extended to get older plans for a customer with a timestamp parameter. (Older plan search is yet to be implemented)
+   * `/plans/{id}`: To GET details of a specific price Plan. Returns a `PricePlan` object if successful. 
+   * `country/{cid}/plans/{name}` : To GET or PUT details of a plan by country. The Content body is JSON representation of `PricePlan` object. Eg. `/country/US/plans/1S`. On applying the PUT method, the older plan is overridden by the new plan.
    
 ## Representation:
 
-   1 PricePlan object is represented as a json as follows (both ways: when sending it as part of request Body or being part of response Body)
+   1 PricePlan object is represented as a json as follows (both ways: when sending it as part of request Body or being part of response Body)( id field is not used when submitting requests)
    ```
     {
     "id": "9f1ddff6-88fd-45fc-98f0-dc4efbc10673",
@@ -38,12 +38,12 @@ Main design decisions were driven by discussions after clarifying requirements o
 As a result, the design choices were limited to (A) whether to represent price of a plan per customer OR (B) just reference the plan name in the customer profile and then update plan metadata in another record where details of that plan are stored. I chose option B as this will make price changes uniform and swift and updates will be singular. Option A would have required me to update each customer's row for that country and be ripe with problems due to inconsistent states.
 
 ### Price changes can be scheduled
-One can also schedule the price changes in future or back-date it in the past. As a result, one can have many plan records for a single country and PlanType, depending on time. This makes sense also for other reasons, as it is probably better to keep every record of price change for historical analysis and compliance reasons. Each pricePlan is keyed by PlanName and country. Once narrowed down by those keys, many price plans exist for that combination. In the current local implementation, a Stack is used to implement plan lineage. In a more traditional data store, this could be implemented using another field like a LastUpdatedTs to keep chronological order of updates. 
+One can also schedule the price changes in future or back-date it in the past. As a result, one can have many plan records for a single country and PlanType, depending on time (but only last updated as the _active_ one. This makes sense also for other reasons, as it is probably better to keep every record of price change for historical analysis and compliance reasons. Each pricePlan is keyed by PlanName and country. Once narrowed down by those keys, many price plans exist for that combination. In the current local implementation, a Stack is used to implement plan lineage. In a more traditional data store, this could be implemented using another field like a _LastUpdatedTs_ to keep chronological order of updates. 
 
 The other inference is that the most recently updated plan is the active plan. (need further discussion on this)
 
 ### Ordering price records by time of update
-The key point to note is that the order is the order in which updates were "received" by the system and not necessarily the order of time when a plan was active. This helps in searches also, as realistically, admins and clients will be only interested in last few updates even though the updates were for different time windows. 
+The key point to note is that the order is the order in which updates were "received" by the system and not necessarily the order of time when a plan was active. This helps in searches also, as realistically, admins and clients will be only interested in last few updates for a country and lplan type, even though the updates could be for vastly different time windows. 
 
 ### Entire Price Record is transferred across the HTTP interface - both ways
 This is another key design decision as it keeps things simple for the client. (very valuable). This way, for example: the client can pick PricePlan as a response from one request and use that right away to make another change on that Plan. There is no need to extract fields, construct myriad objects for different requests. It makes interaction more simple for the clients to reason about as they handle the same structure and semantics of the object across many messages.
