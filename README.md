@@ -14,7 +14,7 @@ The ability to manage pricing for Netflix across various countries and plans. Th
 `java -jar target/netflix-challenge-0.1.0.jar`
 
 ## Validation:
-1. See Design.md for resource documentation. Lets say, you execute a HTTP GET on `/country/US/plans/1S`
+1. See Design.md for resource documentation. Lets say, you execute a HTTP GET on `/country/US/plans/2S`
 
 ## Understanding Response
 
