@@ -43,7 +43,7 @@ One can also schedule the price changes in future or back-date it in the past. A
 The other inference is that the most recently updated plan is the active plan. (need further discussion on this)
 
 ### Ordering price records by time of update
-The key point to note is that the order is the order in which updates were "received" by the system and not necessarily the order of time when a plan was active. This helps in searches also, as realistically, admins and clients will be only interested in last few updates even though the updates were for different time windows. 
+The key point to note is that the order is the order in which updates were "received" by the system and not necessarily the order of time when a plan was active. This helps in searches also, as realistically, admins and clients will be only interested in last few updates for a country and lplan type, even though the updates could be for vastly different time windows. 
 
 ### Entire Price Record is transferred across the HTTP interface - both ways
 This is another key design decision as it keeps things simple for the client. (very valuable). This way, for example: the client can pick PricePlan as a response from one request and use that right away to make another change on that Plan. There is no need to extract fields, construct myriad objects for different requests. It makes interaction more simple for the clients to reason about as they handle the same structure and semantics of the object across many messages.
