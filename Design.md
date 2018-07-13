@@ -6,7 +6,7 @@ The main objective is to implement an interface where an admin can create and up
 
 ## Entities:
 
-The main entity modeled is called PricePlan. It is an immutable representation of resource for indicating price for a plan in a country. It works with another entity Customer. These entities associate to map plan's price for a customer.
+The main entity modeled is called `PricePlan`. It is an immutable representation of resource to store details for a plan in a country. It works with another entity `Customer`. These entities associate to map plan's price to a customer.
 
 ## Interface and Resources:
 The interface is exposed as a HTTP REST interaction, where a client can issue requests to create new plans, modify existing plans or view pricing details of any customer. Here are the reosouces 
