@@ -14,13 +14,7 @@ The ability to manage pricing for Netflix across various countries and plans. Th
 `java -jar target/netflix-challenge-0.1.0.jar`
 
 ## Validation:
-1. Based on above example:
-   * Pricing server will startup with some demo data to play with. (sample here)
-
-2. Make a test request by running this from repo_root in a terminal shell.
-   `./scripts/get_plan.sh US 1S
-	
-   This script will get the plan details for *US* country for plan named as *1S*. You will see the results in client response.
+1. See Design.md for resource documentation. Lets say, you execute a HTTP GET on `/country/US/plans/1S`
 
 ## Understanding Response
 
